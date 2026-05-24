@@ -1,3 +1,32 @@
+# Large data files (never commit)
+*.tif
+*.tiff
+*.img
+*.vrt
+*.npz
+*.match
+*.gcp
+
+# Conda/virtualenv
+.conda/
+env/
+venv/
+
+# ASP outputs you probably don't want
+*-log-*.txt
+run-*.txt
+*-pairlist.txt
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+
+# WSL
+*.lnk
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]

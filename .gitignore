@@ -1,3 +1,6 @@
+# Local-only dev docs / reference PDFs (private to the working tree)
+/docs/
+
 # Large data files (never commit)
 *.tif
 *.tiff

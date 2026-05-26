@@ -1,0 +1,17 @@
+# Python deps for the KH-9 pipeline (S0/S1/S2 helpers in scripts/lib/).
+# Install into the asp_py conda env (or any 3.10+ env on Narval):
+#   conda install -n asp_py -c conda-forge shapely pandas pyarrow pyyaml
+# The asp_py env already has: numpy, rasterio, opencv-python.
+#
+# Listed here for clarity / pip fallback:
+
+pyyaml>=6
+rasterio>=1.3
+shapely>=2
+pandas>=2
+pyarrow>=14
+numpy>=1.24
+opencv-python>=4.8
+
+# Used only by S2 (jitter-pipeline helpers ported from ASP/stereo):
+# csmapi  — bundled with ASP, not pip-installable; jitter helpers source ASP's bundled python

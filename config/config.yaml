@@ -1,23 +1,42 @@
 # KH-9 Pipeline Order
 # Created: 2026-05-24
+# Updated: 2026-05-25
 
-raw_dir: ./                          # defaults to order file's directory
+# Base directory; manifest.subdir is resolved relative to this.
+raw_dir: /mnt/f/data/runs/run-2026-05/
 
-strips:
-  - id: D3C1216-300814-011
-    cameras: [fwd, aft]
-  - id: D3C1216-300814-012
-    cameras: [fwd, aft]
-  - id: D3C1216-300814-009
-    cameras: [fwd, aft]
+# Manifest: pick ONE form below.
+manifest:
+  # Form A — auto-discover from a subdirectory of raw_dir.
+  # The resolver scans the subdir for *.tif / *.tgz, extracts unique
+  # Entity IDs (e.g. D3C1212-400779A014), and groups fwd/aft into strips
+  # by the shared D3C<mission>-<frame>-<seq> stem.
+  subdir: run-001/
+
+  # Form B — explicit entity-ID list (uncomment and remove `subdir` to use).
+  # entity_ids:
+  #   - D3C1216-300814F011
+  #   - D3C1216-300814A011
+  #   - D3C1216-300814F012
+  #   - D3C1216-300814A012
+  #   - D3C1216-300814F009
+  #   - D3C1216-300814A009
 
 compute:
-  match_jobs: 6                      # parallel SIFT workers (~2 GB RAM each)
+  match_jobs: 1           # parallel SIFT workers (~2 GB RAM each)
+  threads_per_job: 4      # threads per parallel_stereo/mapproject worker
 
 paths:
-  dem: /mnt/c/.../dem-adj-43.tif
-  planet: /mnt/c/.../planet_pan_full.tif
-  output_dir: /mnt/f/.../final/
+  metadata_parquet: ./assets/declass3_metadata.parquet
+  dem_tiles_dir:    /mnt/f/data/Raster/DEM/SRTM/GL1/tiles/
+  planet_tiles_dir: /mnt/f/data/Raster/Planet/panchromatic/
+  output_dir:       /mnt/f/data/runs/run-2026-05/output/
 
-stages: [1, 2]
-s2-phases: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17]
+bbox:
+  pad_deg: 0.01           # pad the union footprint before DEM/Planet selection
+
+crop:
+  reuse_parquet: true     # if false, recompute crop windows even if persisted
+
+stages: [0, 1, 2]
+s2_phases: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17]

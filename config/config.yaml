@@ -3,7 +3,7 @@
 # Updated: 2026-05-25
 
 # Base directory; manifest.subdir is resolved relative to this.
-raw_dir: /mnt/f/data/runs/run-2026-05/
+raw_dir: /mnt/f/global-keyhole-pipeline/raw/
 
 # Manifest: pick ONE form below.
 manifest:
@@ -11,7 +11,7 @@ manifest:
   # The resolver scans the subdir for *.tif / *.tgz, extracts unique
   # Entity IDs (e.g. D3C1212-400779A014), and groups fwd/aft into strips
   # by the shared D3C<mission>-<frame>-<seq> stem.
-  subdir: run-001/
+  subdir: 20260409_oaxaca/
 
   # Form B — explicit entity-ID list (uncomment and remove `subdir` to use).
   # entity_ids:
@@ -30,7 +30,18 @@ paths:
   metadata_parquet: ./assets/declass3_metadata.parquet
   dem_tiles_dir:    /mnt/f/data/Raster/DEM/SRTM/GL1/tiles/
   planet_tiles_dir: /mnt/f/data/Raster/Planet/panchromatic/
-  output_dir:       /mnt/f/data/runs/run-2026-05/output/
+  # Per-run working tree. S0 writes <working_dir>/inputs/; S1/S2 write <working_dir>/output/<strip>/.
+  working_dir:      /mnt/f/global-keyhole-pipeline/runs/run-2026-05/
+  # Permanent multi-run archive. Subdirs populated by S1 phases 11–15:
+  #   <archive_dir>/cameras/OBC/<entity>_sub{16,1}.tsai
+  #   <archive_dir>/cameras/CSM/                       (S2 populates)
+  #   <archive_dir>/images/mapproject-16m/<entity>.tif (COG)
+  #   <archive_dir>/images/mapproject-1m/<entity>.tif
+  #   <archive_dir>/DSM/DSM-16m/<strip>_DSM.tif
+  #   <archive_dir>/DSM/DSM-1m/<strip>_DSM.tif
+  archive_dir:      /mnt/f/global-keyhole-pipeline/outputs/
+  # Legacy on-repo camera backup root (OBC/ and CSM/ subdirs live underneath).
+  cameras_repo_dir: ./cameras/complete/
 
 bbox:
   pad_deg: 0.01           # pad the union footprint before DEM/Planet selection
@@ -39,4 +50,5 @@ crop:
   reuse_parquet: true     # if false, recompute crop windows even if persisted
 
 stages: [0, 1, 2]
+s1_phases: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
 s2_phases: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17]

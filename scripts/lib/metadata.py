@@ -36,8 +36,15 @@ class Corners:
 
     def to_lon_lat_values(self) -> str:
         """Format as cam_gen --lon-lat-values expects: 'lon lat lon lat lon lat lon lat'
-        in NW, NE, SE, SW order (top-left, top-right, bottom-right, bottom-left)."""
+        in NW, NE, SE, SW order (top-left, top-right, bottom-right, bottom-left).
+        Use for the forward camera (not rotated)."""
         return " ".join(f"{v:.6f}" for c in (self.nw, self.ne, self.se, self.sw) for v in c)
+
+    def to_lon_lat_values_aft(self) -> str:
+        """Corner order for a 180°-rotated aft image: SE, SW, NW, NE.
+        After 180° rotation the original SE corner is at the image top-left,
+        so the traversal (TL→TR→BR→BL) maps to SE→SW→NW→NE."""
+        return " ".join(f"{v:.6f}" for c in (self.se, self.sw, self.nw, self.ne) for v in c)
 
 
 @dataclass

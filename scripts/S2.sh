@@ -83,20 +83,25 @@ _check_python_env() {
 }
 _check_python_env
 
-# ─── Configuration (loaded from inputs/manifest.resolved.json) ───────────────
+# ─── Configuration (loaded from <working_dir>/inputs/manifest.resolved.json) ─
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 CFG="${1:-${GKP_CONFIG:-$REPO_ROOT/config/config.yaml}}"
 export GKP_CONFIG="$CFG"
-RESOLVED="$REPO_ROOT/inputs/manifest.resolved.json"
+
+# Per-run working tree (config.paths.working_dir).  Holds <working_dir>/inputs/
+# (manifest, DEM, mosaics) and <working_dir>/output/<strip_id>/ (per-strip work).
+WORK_DIR="$("$PYTHON" -c "from scripts.lib.config import load_config; print(load_config('$CFG').paths.working_dir)")"
+INPUTS="$WORK_DIR/inputs"
+RESOLVED="$INPUTS/manifest.resolved.json"
 [[ -f "$RESOLVED" ]] || { echo "[S2] missing $RESOLVED — run S0.sh first" >&2; exit 1; }
 
 # STEREO is the root holding per-strip working trees (forward_sub16.tif,
 # aft_sub16.tif, ba_rpc_gcp_ht/, jitter_solve/, ...). S1 writes those under
-# <output_dir>/<strip_id>/ — that's our $STEREO here.
-STEREO="$("$PYTHON" -c 'import json,sys; print(json.load(open(sys.argv[1]))["output_dir"])' "$RESOLVED")"
-DEM="$REPO_ROOT/inputs/dem.tif"
-PLANET="$REPO_ROOT/inputs/planet.tif"
+# <working_dir>/output/<strip_id>/ — that's our $STEREO here.
+STEREO="$WORK_DIR/output"
+DEM="$INPUTS/dem.tif"
+PLANET="$INPUTS/planet.tif"
 RIG="$STEREO/multi-track-rig"
 
 UTM_EPSG="$("$PYTHON" -c 'import json,sys; print(json.load(open(sys.argv[1]))["utm_epsg"])' "$RESOLVED")"

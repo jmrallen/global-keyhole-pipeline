@@ -23,9 +23,9 @@ def build_resolved(cfg: cfg_mod.Config) -> dict:
     strips = manifest_mod.resolve(cfg)
     fp = fp_mod.compute_footprint(cfg, strips)
 
-    repo = cfg_mod.repo_root()
-    mosaic_dir = repo / "inputs" / "mosaics"
-    cam_gen_dir = repo / "inputs" / "cam_gen"
+    inputs_root = cfg.paths.working_dir / "inputs"
+    mosaic_dir = inputs_root / "mosaics"
+    cam_gen_dir = inputs_root / "cam_gen"
 
     def entity_record(ent: manifest_mod.Entity | None) -> dict | None:
         if ent is None:
@@ -50,9 +50,11 @@ def build_resolved(cfg: cfg_mod.Config) -> dict:
     return {
         "config_path": str(cfg.config_path),
         "raw_dir": str(cfg.raw_dir),
-        "output_dir": str(cfg.paths.output_dir),
-        "dem": str(repo / "inputs" / "dem.tif"),
-        "planet": str(repo / "inputs" / "planet.tif"),
+        "working_dir": str(cfg.paths.working_dir),
+        "archive_dir": str(cfg.paths.archive_dir),
+        "cameras_repo_dir": str(cfg.paths.cameras_repo_dir),
+        "dem": str(inputs_root / "dem.tif"),
+        "planet": str(inputs_root / "planet.tif"),
         "bbox": {
             "min_lon": fp["union_bbox"].min_lon,
             "min_lat": fp["union_bbox"].min_lat,
@@ -68,6 +70,7 @@ def build_resolved(cfg: cfg_mod.Config) -> dict:
             "match_jobs": cfg.compute.match_jobs,
             "threads_per_job": cfg.compute.threads_per_job,
         },
+        "s1_phases": cfg.s1_phases,
         "s2_phases": cfg.s2_phases,
         "strips": [
             {
@@ -82,7 +85,7 @@ def build_resolved(cfg: cfg_mod.Config) -> dict:
 
 
 def write_resolved(cfg: cfg_mod.Config, out_path: Path | None = None) -> Path:
-    out_path = out_path or (cfg_mod.repo_root() / "inputs" / "manifest.resolved.json")
+    out_path = out_path or (cfg.paths.working_dir / "inputs" / "manifest.resolved.json")
     out_path.parent.mkdir(parents=True, exist_ok=True)
     data = build_resolved(cfg)
     out_path.write_text(json.dumps(data, indent=2) + "\n")
@@ -91,7 +94,7 @@ def write_resolved(cfg: cfg_mod.Config, out_path: Path | None = None) -> Path:
 
 
 def main(argv: list[str] | None = None) -> int:
-    p = argparse.ArgumentParser(description="Write inputs/manifest.resolved.json")
+    p = argparse.ArgumentParser(description="Write <working_dir>/inputs/manifest.resolved.json")
     p.add_argument("config", nargs="?", default=None)
     p.add_argument("--out", type=Path, default=None)
     args = p.parse_args(argv)

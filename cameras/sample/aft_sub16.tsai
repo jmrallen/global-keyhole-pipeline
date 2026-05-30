@@ -1,0 +1,16 @@
+VERSION_4
+OPTICAL_BAR
+image_size = 21599 1363
+image_center = 10799.5 681.5
+pitch = 0.000112
+f = 1.52
+scan_time = 1
+forward_tilt = 0
+iC = 0 0 0
+iR = 1 0 0 0 1 0 0 0 1
+speed = 0
+mean_earth_radius = 6371000
+mean_surface_elevation = 800
+motion_compensation_factor = 0
+scan_dir = right
+velocity = 0 0 0

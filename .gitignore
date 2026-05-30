@@ -1,6 +1,12 @@
 # Local-only dev docs / reference PDFs (private to the working tree)
 /docs/
 
+# Local experiments / diagnostics (never committed)
+/experiments/
+
+# Per-machine paths (working_dir, archive_dir, tile dirs etc.) — keep out of git
+/config/config.yaml
+
 # Large data files (never commit)
 *.tif
 *.tiff

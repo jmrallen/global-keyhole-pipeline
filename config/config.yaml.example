@@ -1,0 +1,67 @@
+# KH-9 Pipeline Configuration — example template.
+#
+# Copy to config/config.yaml and edit for your machine.  config.yaml is
+# .gitignored so per-machine path edits don't pollute git history.
+#
+#   cp config/config.yaml.example config/config.yaml
+#   # then edit raw_dir / paths.* to match your storage layout
+
+# Base directory holding raw KH-9 .tif / .tgz pieces.  manifest.subdir below is
+# resolved relative to this.
+raw_dir: /path/to/keyhole/raw/
+
+# Manifest: pick ONE form below.
+manifest:
+  # Form A — auto-discover from a subdirectory of raw_dir.
+  # The resolver scans the subdir for *.tif / *.tgz, extracts unique
+  # Entity IDs (e.g. D3C1212-400779A014), and groups fwd/aft into strips
+  # by the shared D3C<mission>-<frame>-<seq> stem.
+  subdir: YYYYMMDD_aoi_name/
+
+  # Form B — explicit entity-ID list (uncomment and remove `subdir` to use).
+  # entity_ids:
+  #   - D3C1216-300814F011
+  #   - D3C1216-300814A011
+  #   - D3C1216-300814F012
+  #   - D3C1216-300814A012
+
+compute:
+  match_jobs: 1           # parallel SIFT workers (~2 GB RAM each)
+  threads_per_job: 4      # threads per parallel_stereo/mapproject worker
+
+paths:
+  # Repo-relative path to the declass3 metadata parquet (corners + crop windows).
+  metadata_parquet: ./assets/declass3_metadata.parquet
+
+  # External raster libraries used by S0 (DEM mosaic + Planet bbox mosaic).
+  dem_tiles_dir:    /path/to/SRTM/GL1/tiles/
+  planet_tiles_dir: /path/to/Planet/panchromatic/
+
+  # Per-run working tree.  S0 writes <working_dir>/inputs/ (manifest, DEM,
+  # mosaics, cam_gen corners); S1/S2 write <working_dir>/output/<strip>/.
+  # Recommend putting this on a fast external drive — the per-strip work dirs
+  # are tens of GB each.
+  working_dir:      /path/to/runs/run-YYYY-MM/
+
+  # Permanent multi-run archive.  Subdirs populated by S1 Phases 11–15:
+  #   <archive_dir>/cameras/OBC/<entity>_sub{16,1}.tsai
+  #   <archive_dir>/cameras/CSM/                       (S2 populates)
+  #   <archive_dir>/images/mapproject-16m/<entity>.tif (Cloud-Optimized GeoTIFF)
+  #   <archive_dir>/images/mapproject-1m/<entity>.tif
+  #   <archive_dir>/DSM/DSM-16m/<strip>_DSM.tif
+  #   <archive_dir>/DSM/DSM-1m/<strip>_DSM.tif
+  archive_dir:      /path/to/outputs/
+
+  # Legacy on-repo camera backup root (OBC/ and CSM/ subdirs live underneath).
+  # S1 Phase 12 mirrors OBC cameras here in addition to <archive_dir>/cameras/OBC/.
+  cameras_repo_dir: ./cameras/complete/
+
+bbox:
+  pad_deg: 0.01           # pad the union footprint before DEM/Planet selection
+
+crop:
+  reuse_parquet: true     # if false, recompute crop windows even if persisted
+
+stages: [0, 1, 2]
+s1_phases: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+s2_phases: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17]
